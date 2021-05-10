@@ -66,13 +66,13 @@ for(trait in traits){
   cat(out, file=paste0("stats_",trait,".txt"), sep="\n", append=TRUE)
   
   # Run an ANOVA (switched : in Env:Rep and Rep:Block for nesting)
-  model <- lm(get(trait) ~ Genotype + Env + Env/Rep + Rep/Block + Genotype:Env, data=data)
+  model <- lm(get(trait) ~ Genotype + Env + Env/Rep + Env/Rep/Block + Genotype:Env, data=data)
   anova <- anova(model)
   out <- capture.output(anova)
   cat(out, file=paste0("stats_",trait,".txt"), sep="\n", append=TRUE)
   
   # Run a random effects model
-  model.1 <- lmer(get(trait) ~ (1|Genotype) + (1|Env) + (1|Env/Rep) + (1|Rep/Block) + (1|Genotype:Env), data = data, REML = TRUE)
+  model.1 <- lmer(get(trait) ~ (1|Genotype) + (1|Env) + (1|Env/Rep) + (1|Env/Rep/Block) + (1|Genotype:Env), data = data, REML = TRUE)
   # Decreasing stopping tolerances
   strict_tol <- lmerControl(optCtrl=list(xtol_abs=1e-8, ftol_abs=1e-8))
   if (all(model.1@optinfo$optimizer=="nloptwrap")) {
@@ -90,7 +90,7 @@ for(trait in traits){
   write.table(resid(model), paste0("resids_", trait, ".csv"), col.names=F, row.names=F, sep=",")
   # Calculate hertiability 
   model_variances <- as.data.frame(VarCorr(model))
-  h2 <- model_variances$vcov[2]/(model_variances$vcov[2]+(model_variances$vcov[1]/5)+(model_variances$vcov[8]/10))
+  h2 <- model_variances$vcov[2]/(model_variances$vcov[2]+(model_variances$vcov[1]/5)+(model_variances$vcov[9]/10))
   out <- capture.output(h2)
   cat(out, file=paste0("stats_",trait,".txt"), sep="\n", append=TRUE)
   
